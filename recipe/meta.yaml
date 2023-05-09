@@ -48,8 +48,10 @@ requirements:
 
 test:
   commands:
-    - test -f $PREFIX/lib/libCoinUtils${SHLIB_EXT}
-    - test -f $PREFIX/include/coin/CoinSort.hpp
+    - test -f $PREFIX/lib/libCoinUtils${SHLIB_EXT}  # [unix]
+    - if not exist %PREFIX%\\Library\\lib\\libCoinUtils.lib exit 1  # [win]
+    - test -f $PREFIX/include/coin/CoinSort.hpp  # [unix]
+    - if not exist %LIBRARY_INC%\\coin\\CoinSort.hpp exit 1  # [win]
 
 about:
   home: https://www.coin-or.org/
