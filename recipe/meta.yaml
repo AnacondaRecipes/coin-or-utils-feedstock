@@ -13,6 +13,7 @@ source:
 
 build:
   number: 0
+  skip: True # [blas_impl == "mkl"]
   run_exports:
     - {{ pin_subpackage(name, min_pin='x.x', max_pin='x.x') }}
 
@@ -29,18 +30,12 @@ requirements:
   host:
     - zlib
     - bzip2
-    # OpenBLAS or MKL
-    - mkl-devel {{ mkl }}.*           # [blas_impl == "mkl"]
-    - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
+    # OpenBLAS
     - openblas {{ openblas }}         # [blas_impl == "openblas"]
     # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
-    - intel-openmp   {{ mkl }}        # [blas_impl == "mkl"]
   run:
-    # OpenBLAS or MKL
-    - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
+    # OpenBLAS
     - libopenblas                     # [blas_impl == "openblas"]
-    # OpenMP
-    - {{ pin_compatible('intel-openmp') }}   # [blas_impl == "mkl"]
     # To stop the compiler pulling in an openmp implementation itself
     - _openmp_mutex                   # [linux]
   run_constrained:
