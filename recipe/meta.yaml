@@ -35,6 +35,14 @@ requirements:
     - openblas {{ openblas }}         # [blas_impl == "openblas"]
     # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
     - intel-openmp   {{ mkl }}        # [blas_impl == "mkl"]
+  run:
+    # OpenBLAS or MKL
+    - mkl {{ mkl }}.*                 # [blas_impl == "mkl"]
+    - libopenblas                     # [blas_impl == "openblas"]
+    # OpenMP
+    - {{ pin_compatible('intel-openmp') }}   # [blas_impl == "mkl"]
+    # To stop the compiler pulling in an openmp implementation itself
+    - _openmp_mutex                   # [linux]
   run_constrained:
     - coincbc * *_metapackage
 
