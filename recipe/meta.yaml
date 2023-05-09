@@ -45,8 +45,9 @@ test:
     - test -f $PREFIX/include/coin/CoinSort.hpp
 
 about:
-  home: https://projects.coin-or.org/CoinUtils
+  home: https://www.coin-or.org/
   dev_url: https://github.com/coin-or/CoinUtils
+  doc_url: https://coin-or.github.io/CoinUtils/Doxygen/index.html
   license: EPL-2.0
   license_family: OTHER
   license_file: LICENSE
