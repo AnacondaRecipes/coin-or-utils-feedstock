@@ -13,7 +13,7 @@ source:
 
 build:
   number: 0
-  skip: true  # [win]
+  skip: true
   run_exports:
     - {{ pin_subpackage(name, min_pin='x.x', max_pin='x.x') }}
 
@@ -25,6 +25,8 @@ requirements:
     - {{ compiler('fortran') }}
     - pkg-config
     - make  # [unix]
+    - patch  # [not win]
+    - m2-patch  # [win]
   host:
     - zlib
     - bzip2
