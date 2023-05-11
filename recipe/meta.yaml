@@ -8,8 +8,8 @@ package:
 source:
   url: https://github.com/coin-or/CoinUtils/archive/releases/{{ version }}.tar.gz
   sha256: 6ea31d5214f7eb27fa3ffb2bdad7ec96499dd2aaaeb4a7d0abd90ef852fc79ca
-  patches:
-    - 0001-Patch-for-downstream.patch
+  # patches:
+  #   - 0001-Patch-for-downstream.patch
 
 build:
   number: 0
@@ -25,8 +25,8 @@ requirements:
     - {{ compiler('fortran') }}
     - pkg-config
     - make  # [unix]
-    - patch  # [not win]
-    - m2-patch  # [win]
+    # - patch  # [not win]
+    # - m2-patch  # [win]
   host:
     - zlib
     - bzip2
