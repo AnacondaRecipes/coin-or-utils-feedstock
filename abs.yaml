@@ -1,5 +1,0 @@
-channels:
-    build: or-tools
-build_parameters:
-  - "--suppress-variables"
-  - "--error-overlinking"
