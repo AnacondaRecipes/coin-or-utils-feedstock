@@ -1,53 +1,57 @@
 {% set name = "coin-or-utils" %}
-{% set version = "2.11.6" %}
+{% set version = "2.11.13" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/coin-or/CoinUtils/archive/releases/{{ version }}.tar.gz
-  sha256: 6ea31d5214f7eb27fa3ffb2bdad7ec96499dd2aaaeb4a7d0abd90ef852fc79ca
+  url: https://github.com/coin-or/CoinUtils/archive/refs/tags/releases/{{ version }}.tar.gz
+  sha256: ddfea48e10209215748bc9f90a8c04abbb912b662c1aefaf280018d0a181ef79
+  patches:
+    - patches/0001-Patch-for-downstream.patch
 
 build:
   number: 0
-  skip: True # [blas_impl == "mkl"]
   run_exports:
     - {{ pin_subpackage(name, min_pin='x.x', max_pin='x.x') }}
 
 requirements:
   build:
-    - gnuconfig  # [unix]
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
-    - pkg-config
-    - make  # [unix]
+    - {{ compiler('fortran') }}  # [unix]
+    - gnuconfig
+    - pkg-config        # [unix]
+    - make              # [unix]
+    - msys2-make        # [win]
+    - msys2-pkg-config  # [win]
+    - msys2-grep        # [win]
+    - msys2-sed         # [win]
+    - msys2-bash        # [win]
+    - msys2-base        # [win]
   host:
-    - zlib
-    - bzip2
-    # OpenBLAS
-    - openblas {{ openblas }}         # [blas_impl == "openblas"]
-    # For openblas on win and linux, we don't specify any openmp implementation; it comes from the compiler.
-  run:
-    # OpenBLAS
-    - libopenblas                     # [blas_impl == "openblas"]
-    # To stop the compiler pulling in an openmp implementation itself
-    - _openmp_mutex                   # [linux]
+    - openblas-devel {{ openblas }}  # [unix]
+    - mkl-devel {{ mkl }}            # [win]
+    - zlib {{ zlib }}
+    - bzip2 {{ bzip2 }}
   run_constrained:
     - coincbc * *_metapackage
 
 test:
+  requires:
+    - msys2-binutils    # [win]
   commands:
-    - test -f $PREFIX/lib/libCoinUtils${SHLIB_EXT}  # [unix]
-    - if not exist %PREFIX%\\Library\\lib\\libCoinUtils.lib exit 1  # [win]
-    - test -f $PREFIX/include/coin/CoinSort.hpp  # [unix]
-    - if not exist %LIBRARY_INC%\\coin\\CoinSort.hpp exit 1  # [win]
+    - test -f $PREFIX/lib/libCoinUtils${SHLIB_EXT}         # [unix]
+    - test -f $PREFIX/include/coin/CoinSort.hpp            # [unix]
+    - if not exist %LIBRARY_LIB%/libCoinUtils.lib exit 1   # [win]
+    - if not exist %LIBRARY_INC%/coin/CoinSort.hpp exit 1  # [win]
+    - strings %LIBRARY_LIB%\\libCoinUtils.lib | findstr /C:"RuntimeLibrary=MD"  # [win]
 
 about:
-  home: https://www.coin-or.org/
+  home: https://github.com/coin-or/CoinUtils
   dev_url: https://github.com/coin-or/CoinUtils
-  doc_url: https://coin-or.github.io/CoinUtils/Doxygen/index.html
   license: EPL-2.0
   license_family: OTHER
   license_file: LICENSE
@@ -70,3 +74,4 @@ extra:
     - wolfv
     - tkralphs
     - jschueller
+    - jpfeuffer
