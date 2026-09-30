@@ -5,7 +5,7 @@ set SRC_DIR=%SRC_DIR:\=/%
 set MSYSTEM=MINGW%ARCH%
 set MSYS2_PATH_TYPE=inherit
 set CHERE_INVOKING=1
-set BUILD_PLATFORM=win-64
+if "%ARCH%"=="arm64" (set BUILD_PLATFORM=win-arm64) else (set BUILD_PLATFORM=win-64)
 
 set BASH=%BUILD_PREFIX%\Library\usr\bin\bash.exe
 

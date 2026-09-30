@@ -13,7 +13,11 @@ else
     USE_PREFIX=$PREFIX
 fi
 
-if [[ "${target_platform}" == win-* ]]; then
+if [[ "${target_platform}" == win-arm64 ]]; then
+    BLAS_LIB=( --with-blas-lib='${libdir}/openblas.lib' )
+    LAPACK_LIB=( --with-lapack-lib='${libdir}/openblas.lib' )
+    EXTRA_FLAGS=( --enable-msvc=MD )
+elif [[ "${target_platform}" == win-* ]]; then
     BLAS_LIB=( --with-blas-lib='${libdir}/mkl_rt.lib' )
     LAPACK_LIB=( --with-lapack-lib='' )
     EXTRA_FLAGS=( --enable-msvc=MD )
