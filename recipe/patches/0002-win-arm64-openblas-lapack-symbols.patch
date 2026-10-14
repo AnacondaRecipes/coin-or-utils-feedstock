@@ -1,0 +1,59 @@
+From 3f7b0c1a4e6d4a2f8c9b5d1e2a3f4c5b6d7e8f90 Mon Sep 17 00:00:00 2001
+From: Eric Lundby <Eric.Lundby@gmail.com>
+Date: Wed, 30 Sep 2026 20:10:00 -0600
+Subject: [PATCH] Use gfortran-style LAPACK symbol names for OpenBLAS (win-arm64)
+
+When configure cannot find a Fortran compiler, CoinUtils falls back to a
+hard-coded name mangling. That is the case for this Windows recipe, since it
+only requires compiler('fortran') on unix. The fallback defaults to MKL-style
+(uppercase) names.
+
+win-64 links mkl_rt.lib, which exports DGETRF/DGETRS, so uppercase is correct
+there. win-arm64 links OpenBLAS, which exports the gfortran-style dgetrf_ and
+dgetrs_, so DGETRF/DGETRS stay unresolved and every downstream executable
+fails to link (e.g. clp: unresolved external symbol DGETRS).
+
+Select the else branch, which defines the gfortran-style names.
+
+Why not just add a Fortran compiler to the build requirements instead? That is
+not a fix, for two reasons:
+
+  * It only sets F77_FUNC indirectly. configure.ac calls AC_COIN_PROG_F77 and
+    defines the mangling only if that probe finds a working compiler, so a
+    failed probe silently leaves the uppercase fallback in place - producing a
+    package that builds fine and is still unlinkable.
+  * It has a real cost. flang carries a *strong* run_export
+    ("libflang >=20.1.8"), and strong run_exports from build-only deps are
+    applied to the output. coin-or-utils would gain an unused libflang runtime
+    dependency, and so would everything that links it (clp, cbc, osi, ...).
+
+Selecting the branch here is deterministic and costs nothing.
+
+Note this header is only compiled into CoinUtils itself (the block is guarded
+by defined(COINUTILS_BUILD)) and the installed header is the generated
+config_coinutils.h, so downstream consumers are unaffected.
+---
+ CoinUtils/src/CoinUtilsConfig.h | 7 ++++---
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/CoinUtils/src/CoinUtilsConfig.h b/CoinUtils/src/CoinUtilsConfig.h
+index e5f1a2b..9d3c4d7 100644
+--- a/CoinUtils/src/CoinUtilsConfig.h
++++ b/CoinUtils/src/CoinUtilsConfig.h
+@@ -50,7 +50,12 @@
+ #if defined(COINUTILS_BUILD) && !defined(F77_FUNC)
+-#if 1
++/* OpenBLAS exports gfortran-style names (dgetrf_); MKL exports uppercase
++   (DGETRF). Use the gfortran convention when linking OpenBLAS.
++   Adding a Fortran compiler build dependency is not a fix: it only defines
++   F77_FUNC indirectly via configure's probe (which can silently fail), and
++   flang's strong run_export would force an unused libflang runtime dep. */
++#if 0
+ # define F77_FUNC(name,NAME) NAME
+ # define F77_FUNC_(name,NAME) NAME
+ #else
+ # define F77_FUNC(name,NAME) name ## _
+ # define F77_FUNC_(name,NAME) name ## __
+-- 
+2.30.1
+

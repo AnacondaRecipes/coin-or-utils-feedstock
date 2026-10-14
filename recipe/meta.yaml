@@ -10,9 +10,10 @@ source:
   sha256: ddfea48e10209215748bc9f90a8c04abbb912b662c1aefaf280018d0a181ef79
   patches:
     - patches/0001-Patch-for-downstream.patch
+    - patches/0002-win-arm64-openblas-lapack-symbols.patch  # [win and arm64]
 
 build:
-  number: 2
+  number: 3
   run_exports:
     - {{ pin_subpackage(name, min_pin='x.x', max_pin='x.x') }}
 
